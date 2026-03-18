@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eid Countdown</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0a2e 0%, #1a1a4e 50%, #0d2b1a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* Stars */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.2; transform: scale(1); }
+      to   { opacity: 1;   transform: scale(1.4); }
+    }
+
+    /* Moon */
+    .moon {
+      position: relative;
+      z-index: 1;
+      width: 90px; height: 90px;
+      background: #f5d76e;
+      border-radius: 50%;
+      box-shadow: 0 0 40px #f5d76e88, 0 0 80px #f5d76e44;
+      margin-bottom: 10px;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+    .moon::after {
+      content: '';
+      position: absolute;
+      top: 8px; left: 18px;
+      width: 70px; height: 70px;
+      background: #1a1a4e;
+      border-radius: 50%;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 30px #f5d76e88; }
+      to   { box-shadow: 0 0 70px #f5d76ecc, 0 0 120px #f5d76e55; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .arabic {
+      font-size: 2.2rem;
+      color: #f5d76e;
+      letter-spacing: 4px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px #f5d76e88;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #f5d76e, #fff, #f5d76e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: #a8d8a8;
+      font-size: 1rem;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+    }
+
+    /* Date picker */
+    .date-picker {
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .date-picker label {
+      color: #f5d76e;
+      font-size: 0.9rem;
+    }
+    .date-picker input[type="date"] {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #f5d76e55;
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px 14px;
+      font-size: 1rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .date-picker input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+
+    /* Countdown boxes */
+    .countdown {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .box {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(245,215,110,0.3);
+      border-radius: 16px;
+      padding: 24px 28px;
+      min-width: 100px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s;
+    }
+    .box:hover { transform: translateY(-6px); }
+
+    .box .num {
+      font-size: 3.2rem;
+      font-weight: 700;
+      color: #f5d76e;
+      line-height: 1;
+      text-shadow: 0 0 20px #f5d76e88;
+    }
+    .box .label {
+      font-size: 0.75rem;
+      color: #a8d8a8;
+      letter-spacing: 2px;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    /* Eid message */
+    .eid-msg {
+      display: none;
+      font-size: 2rem;
+      color: #f5d76e;
+      animation: pulse 1.5s ease-in-out infinite;
+      text-shadow: 0 0 30px #f5d76e;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.08); }
+    }
+
+    /* Lanterns */
+    .lanterns {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .lantern {
+      position: absolute;
+      top: -60px;
+      font-size: 2.2rem;
+      animation: swing 4s ease-in-out infinite alternate;
+      transform-origin: top center;
+    }
+    @keyframes swing {
+      from { transform: rotate(-12deg); }
+      to   { transform: rotate(12deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Stars -->
+  <div class="stars" id="stars"></div>
+
+  <!-- Lanterns -->
+  <div class="lanterns" id="lanterns"></div>
+
+  <!-- Moon -->
+  <div class="moon" style="position:relative;z-index:1;margin-top:0"></div>
+
+  <div class="container">
+    <div class="arabic">عيد مبارك</div>
+    <h1>Eid Countdown</h1>
+    <p class="subtitle">✦ May Peace & Blessings Be Upon You ✦</p>
+
+    <div class="date-picker">
+      <label for="eidDate">🗓 Set Eid Date:</label>
+      <input type="date" id="eidDate" />
+    </div>
+
+    <div class="countdown" id="countdown">
+      <div class="box"><div class="num" id="days">00</div><div class="label">Days</div></div>
+      <div class="box"><div class="num" id="hours">00</div><div class="label">Hours</div></div>
+      <div class="box"><div class="num" id="minutes">00</div><div class="label">Minutes</div></div>
+      <div class="box"><div class="num" id="seconds">00</div><div class="label">Seconds</div></div>
+    </div>
+
+    <div class="eid-msg" id="eidMsg">🌙 Eid Mubarak! 🌙</div>
+  </div>
+
+  <script>
+    // Stars
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random() * 3 + 1;
+      s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*100}%;
+        left:${Math.random()*100}%;
+        animation-delay:${Math.random()*4}s;
+        animation-duration:${2+Math.random()*3}s;
+      `;
+      starsEl.appendChild(s);
+    }
+
+    // Lanterns
+    const lanternEl = document.getElementById('lanterns');
+    const lanternEmojis = ['🏮','🪔','🕌'];
+    [10, 30, 55, 75, 90].forEach((left, i) => {
+      const l = document.createElement('div');
+      l.className = 'lantern';
+      l.textContent = lanternEmojis[i % lanternEmojis.length];
+      l.style.cssText = `left:${left}%; animation-delay:${i*0.7}s; animation-duration:${3+i*0.5}s;`;
+      lanternEl.appendChild(l);
+    });
+
+    // Default Eid date (next upcoming — adjust as needed)
+    const input = document.getElementById('eidDate');
+    const stored = localStorage.getItem('eidDate');
+    if (stored) input.value = stored;
+    else {
+      // Default: Eid al-Adha 2025
+      input.value = '2025-06-06';
+    }
+
+    input.addEventListener('change', () => localStorage.setItem('eidDate', input.value));
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function update() {
+      const target = new Date(input.value + 'T00:00:00');
+      const now = new Date();
+      const diff = target - now;
+
+      const countdown = document.getElementById('countdown');
+      const eidMsg    = document.getElementById('eidMsg');
+
+      if (diff <= 0) {
+        countdown.style.display = 'none';
+        eidMsg.style.display = 'block';
+        return;
+      }
+
+      countdown.style.display = 'flex';
+      eidMsg.style.display = 'none';
+
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      document.getElementById('days').textContent    = pad(d);
+      document.getElementById('hours').textContent   = pad(h);
+      document.getElementById('minutes').textContent = pad(m);
+      document.getElementById('seconds').textContent = pad(s);
+    }
+
+    update();
+    setInterval(update, 1000);
+  </script>
+</body>
+</html>
